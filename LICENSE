@@ -27,3 +27,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Release opening-check-v2 is the same NVIDIA model retrained by HifzFlow on
+muaalem-annotated-v3 by obadx (https://huggingface.co/datasets/obadx/muaalem-annotated-v3, MIT)
+and the RetaSy Quranic Audio Dataset (https://huggingface.co/datasets/RetaSy/quranic_audio_dataset,
+CC-BY-4.0). The model files remain under CC-BY-4.0.
