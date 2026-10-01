@@ -2,6 +2,32 @@
 
 Models that HifzFlow runs on learners' own devices, published so the apps can download them.
 
+## Ayah checker v3 (also trained on practice situations)
+
+`ayah-opening-checker.int8.onnx` (133 MB, same format and vocabulary as v1 and v2) and `ayah-opening-checker.vocab.json`, attached to the [`opening-check-v3` release](https://github.com/SimplifAI-Inc/hifzflow-models/releases/tag/opening-check-v3).
+
+v2, trained further on how learners actually practise (scripts in [`train/`](train): `prep_practice.py`, `mix_practice.py`). In HifzFlow it is the second opinion on every red word: a word turns red only if this model did not hear it either.
+
+**Added training data:** 20,000 practice situations built from whole professional segments of obadx/muaalem-annotated-v3 (MIT, the same 18 reciters and held-out rules as v2). They cover a phrase repeated 2-4 times, going back an ayah, long pauses, another reciter quietly in the background, an ayah followed by a similar passage elsewhere, and a cough or microphone knock. Each is labelled with the words actually recited, repetitions kept. Mixed with v2's training mix and continued from v2 (one epoch, learning rate 2e-5), chosen at step 2,814.
+
+**Measured** (sets never used for training or for choosing this version):
+
+| | v2 | v3 |
+|---|---|---|
+| Word error, held-out reciters | 0.40% | 0.39% |
+| Real learners (RetaSy test half), correct recitations where a word was "not heard" | 7% (3.8% of words) | 4% (2.0% of words) |
+| Real learners, recitations with mistakes where a word was not heard | 25% (13.9% of words) | 20% (11.4% of words) |
+| As HifzFlow's second opinion, mistake benchmark (700 recordings), mistakes caught | | same as v2, a few kinds 4-8 points higher |
+
+| File | Bytes | SHA-256 |
+|---|---|---|
+| `ayah-opening-checker.int8.onnx` | 132,714,002 | `9176f407abc47a82608226118c5e0f6bb1acf4705245c0a46b5e3a68ef8efe37` |
+| `ayah-opening-checker.vocab.json` | 21,062 | `c55877f3bff8bc3aaefc160e8c2fb88cb349088d092513d40210ccfe535e671b` |
+
+### Retrain it
+
+After v2's steps (see below): `python train/prep_practice.py train` (needs the relabelled clips from HifzFlow's following-model data preparation), `python train/mix_practice.py full/train.jsonl practice_train.jsonl mix_learners.jsonl mix_practice.jsonl`, then `python train/train_ctc.py mix_practice.jsonl held.jsonl runs/prac 1 2e-5 --learners=retasy_val.jsonl --init=runs/learn/step1000.nemo --eval-every=500`.
+
 ## Ayah checker v2 (trained on Quran recitation)
 
 `ayah-opening-checker.int8.onnx` (133 MB, same format and vocabulary as v1) and `ayah-opening-checker.vocab.json`, attached to the [`opening-check-v2` release](https://github.com/SimplifAI-Inc/hifzflow-models/releases/tag/opening-check-v2).
@@ -84,5 +110,5 @@ python build/quantize.py            # int8 per channel: ayah-opening-checker.int
 ## Licences
 
 - **The model files** are NVIDIA's model with the changes above, under **CC-BY-4.0**; see [`CC-BY-4.0.txt`](CC-BY-4.0.txt). Credit: *Arabic FastConformer model by NVIDIA (stt_ar_fastconformer_hybrid_large_pcd_v1.0), CC-BY-4.0.*
-- **v2 was also trained on** *muaalem-annotated-v3 by obadx* (MIT) and the *Quranic Audio Dataset: Crowdsourced and Labeled Recitation from Non-Arabic Speakers by RetaSy* (CC-BY-4.0).
+- **v2 and v3 were also trained on** *muaalem-annotated-v3 by obadx* (MIT) and the *Quranic Audio Dataset: Crowdsourced and Labeled Recitation from Non-Arabic Speakers by RetaSy* (CC-BY-4.0).
 - **The scripts in `build/` and `train/`** are MIT; see [`LICENSE`](LICENSE).
